@@ -11,6 +11,8 @@ class BaseDeDatos
  
 private $campos=null;
 private $donde=null;
+private $agrupacion="";
+private $ordenacion="";
 private $valores=null;
 
   public function __construct($host = null, $usuario = null, $contrasena = null, $bd = null)
@@ -59,7 +61,25 @@ public function definir_donde($campo, $contenido, $operador="="){
     }else{
         $this->donde=$this->donde." AND".$campo.$operador.$contenido;
     }
+    return $this;
+}
 
+public function agrupar_por($campo){
+    if($this->agrupacion==""){
+        $this->agrupacion=" GROUP BY ".$campo;
+    }else{
+        $this->agrupacion=$this->agrupacion.", ".$campo." ";
+    }
+    return $this;
+}
+
+public function ordenar_por($campo, $direccion=" ASC "){
+    if($this->ordenacion==""){
+        $this->ordenacion=" ORDER BY ".$campo." ".$direccion;
+    }else{
+        $this->ordenacion=$this->ordenacion.", ".$campo." ".$direccion;
+    }
+    return $this;
 }
 
 public function definir_campos($campo){
@@ -74,8 +94,14 @@ public function definir_campos($campo){
 
 
 public function obtener($tabla, $limite=null){
-    $sentencia="SELECT ".($this->campos!=null?$this->campos:'*').' FROM '.$tabla.($this->donde!=null?' WHERE '.$this->donde:'').';';
-
+    $sentencia="SELECT ".($this->campos!=null?$this->campos:'*').' FROM '.$tabla.($this->donde!=null?' WHERE '.$this->donde:'')
+                    .$this->agrupacion
+                    .$this->ordenacion
+                    .';';
+                    echo $sentencia;
+    $this->donde="";
+    $this->agrupacion="";
+    $this->ordenacion="";
         return $this->mysqli->query($sentencia);
 }
 
@@ -94,6 +120,15 @@ public function insertar($tabla){
         return $this->mysqli->query($sentencia);
     }else{
         echo "No hay valores para insertar en la tabla " .$tabla;
+    }
+}
+public function borrar($tabla){
+    if(is_string($tabla)){
+        $sentencia="DELETE FROM ".$tabla.($this->donde!=null?' WHERE '.$this->donde:'');
+        $this->donde="";
+        return $this->mysqli->query($sentencia);
+    }else{
+        return false;
     }
 }
 

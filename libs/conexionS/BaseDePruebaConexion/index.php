@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once('BaseDeDatos_class.php');
 error_reporting(E_ALL);
 $action = 'adddb';
@@ -7,14 +7,16 @@ $data = array();
 function printReceptors () {
     global $db;
 //recibe el receptor de la base de datos que se conecta más abajo
-    $receptor = $db->obtener ("receptor");
+    $receptor = $db->ordenar_por("id","DESC")->agrupar_por("nombre");
+    $receptor = $receptor->obtener("receptor");
     while($r = $receptor->fetch_array()){
         echo "<tr>
-            <td>{$r['id_receptor']}</td>
+            <td>{$r['id']}</td>
             <td>{$r['nombre']}</td>
             <td>{$r['colonia']}</td>
             <td>{$r['codigo_postal']}</td>
             <td>{$r['rfc']}</td>
+            <td><a href='index.php?action=delete&id=$r[id]'>borrar</a></td>
         </tr>";
     }
     
@@ -34,14 +36,23 @@ function action_adddb () {
     exit;
 }
 
+function action_delete () {
+    global $db;
+    $db->definir_donde("id", $_GET['id']);
+    $resultado_borrar = $db->borrar("receptor");
+    var_dump($resultado_borrar);
+    exit;
+}
+
 
 //Esto comenzará a funcionar cuando la clase BaseDeDatos_class este funcionando
 
-$db = new baseDeDatos ('localhost', 'root', '', 'pruebas');
+$db = new baseDeDatos ('localhost', '', '', 'pruebas');
 if ($_GET) {
     $f = "action_".$_GET['action'];
     if (function_exists ($f)) {
         $f();
+        //action_delete();
     }
 }
 
