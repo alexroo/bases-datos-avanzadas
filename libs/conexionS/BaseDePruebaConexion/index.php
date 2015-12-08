@@ -7,7 +7,7 @@ $data = array();
 function printReceptors () {
     global $db;
 //recibe el receptor de la base de datos que se conecta más abajo
-    $receptor = $db->ordenar_por("id","DESC")->agrupar_por("nombre");
+    $receptor = $db->ordenar_por("id_receptor","DESC")->agrupar_por("nombre");
     $receptor = $receptor->obtener("receptor");
     while($r = $receptor->fetch_array()){
         echo "<tr>
